@@ -22,7 +22,7 @@ import hashlib
 import hmac
 import os
 import secrets as _secrets
-import stat
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -51,13 +51,22 @@ def load_or_create_secret(path: str | Path) -> bytes:
     if p.exists():
         return p.read_bytes().strip()
     p.parent.mkdir(parents=True, exist_ok=True)
+    # Publish a fully written, owner-only file without replacing another
+    # process's secret. Readers never observe an empty/partial new file.
     secret = _secrets.token_hex(32).encode("ascii")
-    p.write_bytes(secret + b"\n")
+    fd, temporary = tempfile.mkstemp(prefix=".permitd-secret-", dir=p.parent)
     try:
-        p.chmod(stat.S_IRUSR | stat.S_IWUSR)
-    except OSError:
-        pass
-    return secret
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(secret + b"\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        try:
+            os.link(temporary, p)
+        except FileExistsError:
+            return p.read_bytes().strip()
+        return secret
+    finally:
+        os.unlink(temporary)
 
 
 def _resolve_secret(secret: Optional[str | bytes], secret_path: Optional[str | Path]) -> bytes:
