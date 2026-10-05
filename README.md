@@ -89,6 +89,25 @@ $ permitd audit
 
 That is the whole product: propose, approve, execute, audit line.
 
+## Run the included demo from this checkout
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -e '.[dev]'
+.venv/bin/python examples/approval_demo.py --db permitd.db
+```
+
+The demo prints a permit ID. Approve it from another terminal, then retry:
+
+```sh
+.venv/bin/permitd --db permitd.db approve PRM-REPLACE_WITH_ID
+.venv/bin/python examples/approval_demo.py --db permitd.db --permit-id PRM-REPLACE_WITH_ID
+.venv/bin/permitd --db permitd.db audit --verify
+```
+
+Delivery is simulated; no message is sent. Reusing the same permit is refused.
+Use the same `--to` and `--body` values when proposing and retrying.
+
 ## What the permit actually guarantees
 
 - **Bound to exact arguments.** A permit is scoped to
