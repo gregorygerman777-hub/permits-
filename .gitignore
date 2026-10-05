@@ -9,3 +9,4 @@ build/
 *.db.secret
 *_audit.jsonl
 permitd.secret
+*.jsonl.lock

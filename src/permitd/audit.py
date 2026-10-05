@@ -20,6 +20,12 @@ import hashlib
 import json
 import os
 import threading
+from contextlib import contextmanager
+
+try:
+    import fcntl
+except ImportError:  # Windows retains per-object thread locking.
+    fcntl = None
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -74,14 +80,27 @@ class AuditLog:
         self._lock = threading.Lock()
         self.dropped = 0  # audit lines lost to write failures (best-effort contract)
 
+    @contextmanager
+    def _writer_lock(self):
+        """Lock the complete read-tip/append transaction across POSIX processes."""
+        with self._lock:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            with self.path.with_name(self.path.name + ".lock").open("ab") as lock:
+                if fcntl is not None:
+                    fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+                try:
+                    yield
+                finally:
+                    if fcntl is not None:
+                        fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
     def log(self, entry: Dict[str, Any]) -> None:
         """Append one record; `ts` is stamped here in UTC ISO-8601 and `prev`
         chains it to the line before. `prev` is read from the file on every
         write so several processes (a Gate and the CLI) chain correctly."""
         record = {"ts": datetime.now(timezone.utc).isoformat(), **entry}
         try:
-            with self._lock:
-                self.path.parent.mkdir(parents=True, exist_ok=True)
+            with self._writer_lock():
                 last = _last_line(self.path)
                 record["prev"] = _line_hash(last) if last is not None else GENESIS
                 line = json.dumps(record, ensure_ascii=False) + "\n"
