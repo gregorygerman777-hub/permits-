@@ -192,3 +192,37 @@ def test_refusal_and_failure_are_audited(tmp_path):
         kernel.execute("t", {}, p.id, runner=boom)
     events = [json.loads(l)["event"] for l in audit_path.read_text().splitlines()]
     assert "refused" in events and "failed" in events
+
+
+def test_secret_creation_is_atomic_across_processes(tmp_path):
+    import hashlib
+    import os
+    import subprocess
+    import sys
+    from permitd import load_or_create_secret
+
+    path = tmp_path / "shared.secret"
+    code = """
+import hashlib, sys
+from permitd import load_or_create_secret
+print(hashlib.sha256(load_or_create_secret(sys.argv[1])).hexdigest())
+"""
+    processes = [subprocess.Popen([sys.executable, "-c", code, str(path)],
+                                 stdout=subprocess.PIPE, text=True)
+                 for _ in range(8)]
+    try:
+        hashes = []
+        for process in processes:
+            output, _ = process.communicate(timeout=30)
+            assert process.returncode == 0
+            hashes.append(output.strip())
+    finally:
+        for process in processes:
+            if process.poll() is None:
+                process.kill()
+                process.wait()
+    assert set(hashes) == {hashlib.sha256(path.read_bytes().strip()).hexdigest()}
+    assert len(load_or_create_secret(path)) == 64
+    assert not list(tmp_path.glob(".permitd-secret-*"))
+    if os.name == "posix":
+        assert path.stat().st_mode & 0o777 == 0o600
