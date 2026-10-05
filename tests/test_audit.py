@@ -176,3 +176,32 @@ def test_cli_verify_and_tip(tmp_path):
     out = subprocess.run([sys.executable, "-m", "permitd.cli", "audit", "--verify"],
                          capture_output=True, text=True, env=env)
     assert out.returncode == 1 and "BROKEN at line 2" in out.stderr
+
+
+def test_concurrent_process_writers_preserve_chain(tmp_path):
+    import os
+    import pytest
+    if os.name != "posix":
+        pytest.skip("cross-process file locks require POSIX")
+    path = tmp_path / "concurrent.jsonl"
+    code = """
+import sys
+from permitd import AuditLog
+log = AuditLog(sys.argv[1])
+for i in range(50):
+    log.log({"event": "concurrent", "n": i})
+assert log.dropped == 0
+"""
+    processes = [subprocess.Popen([sys.executable, "-c", code, str(path)])
+                 for _ in range(4)]
+    try:
+        for process in processes:
+            assert process.wait(timeout=30) == 0
+    finally:
+        for process in processes:
+            if process.poll() is None:
+                process.kill()
+                process.wait()
+    result = AuditLog(path).verify()
+    assert result.ok, result
+    assert result.lines == 200
