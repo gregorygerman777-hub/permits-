@@ -178,6 +178,11 @@ $ permitd audit --tip        # store this somewhere the writer can't reach
 9b1c…e4
 ```
 
+Audit tails read backward from the end of the file, so viewing recent
+entries does not load the entire log. On POSIX systems, concurrent writers
+share an advisory lock (`*.jsonl.lock`) to keep the hash chain intact.
+Windows retains per-object thread locking; use a single writer there.
+
 Writes are best-effort by contract (an audit failure never blocks a call);
 `AuditLog.dropped` counts any lines lost that way.
 

@@ -155,15 +155,33 @@ class AuditLog:
 
     def tail(self, n: int = 50) -> List[Dict[str, Any]]:
         """The most recent `n` records, oldest first."""
+        if n <= 0:
+            return []
         try:
             if not self.path.exists():
                 return []
-            with self._lock:
-                lines = self.path.read_text(encoding="utf-8").splitlines()
+            with self._lock, self.path.open("rb") as stream:
+                stream.seek(0, os.SEEK_END)
+                position = stream.tell()
+                chunks = []
+                newlines = 0
+                # One extra separator keeps a partial first line out of the
+                # requested suffix, including when the file ends in a newline.
+                while position > 0 and newlines <= n:
+                    size = min(8192, position)
+                    position -= size
+                    stream.seek(position)
+                    chunk = stream.read(size)
+                    chunks.append(chunk)
+                    newlines += chunk.count(b"\n")
+                suffix = b"".join(reversed(chunks))
+                lines = suffix.split(b"\n")
+                if lines and not lines[-1]:
+                    lines.pop()
+                lines = lines[-n:]
             out: List[Dict[str, Any]] = []
-            for line in lines[-n:]:
-                line = line.strip()
-                if not line:
+            for line in lines:
+                if not line.strip():
                     continue
                 try:
                     out.append(json.loads(line))

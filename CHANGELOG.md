@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Read audit tails backward in chunks rather than loading the entire log.
+  Nonpositive tail counts return no records.
+- Serialize audit appends across POSIX processes using an advisory lock.
+  Windows retains per-object thread locking; use one writer there.
+- Publish fully written, owner-only signing secrets atomically, without
+  overwriting another process's secret during concurrent initialization.
+
 ## 0.2.0 — 2026-09-02
 
 - Audit trail is hash-chained: every line carries `prev`, the SHA-256 of the
