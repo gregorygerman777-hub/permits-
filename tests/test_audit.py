@@ -205,3 +205,19 @@ assert log.dropped == 0
     result = AuditLog(path).verify()
     assert result.ok, result
     assert result.lines == 200
+
+
+def test_tail_reads_large_unicode_records_and_handles_bad_lines(tmp_path):
+    path = tmp_path / "tail.jsonl"
+    records = [{"n": i, "text": "猫" * 6000} for i in range(8)]
+    path.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in records),
+                    encoding="utf-8")
+    log = AuditLog(path)
+    assert log.tail(2) == records[-2:]
+    assert log.tail(20) == records
+    assert log.tail(0) == []
+    assert log.tail(-1) == []
+    with path.open("a") as stream:
+        stream.write("\nnot JSON\n\n" + json.dumps({"n": 9}) + "\n")
+    assert log.tail(3) == [{"n": 9}]
+    assert log.tail(4) == [records[-1], {"n": 9}]
