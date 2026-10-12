@@ -10,12 +10,12 @@ Created: 2026-07-29
 2. **License:** MIT. This is an adoption/portfolio play; AGPL-by-reflex was
    explicitly rejected for this artifact. MIT over Apache-2.0 for brevity — no
    patent-grant machinery, one page a stranger actually reads.
-3. **Repo:** `hbar-systems/permitd`, **public from day one**.
+3. **Repo:** `gregorygerman777-hub/permits-`, **public from day one**.
 
 ## What this is
 
-A pip-installable governance kernel for agent tool execution, extracted from
-`brainfoundry-nous` (where it runs in production as the tool-dispatch gate).
+A pip-installable governance kernel for agent tool execution, built from the
+tool-dispatch gate of my personal AI node (where it runs in production).
 One artifact, two vocabularies, deliberately:
 
 - **Governance vocabulary:** permits, per-call approval, fail-closed
@@ -115,21 +115,21 @@ call executes with the audit line landing. No agent-side changes at all.
 
 ## Ancestry
 
-- `hbar-systems/hbar.brain.console` (2026-03) — the original
+- My earlier console prototype (2026-03) — the original
   PROPOSE/CONFIRM/EXECUTE + audit-trail prototype; the interaction grammar
   started there.
-- `brainfoundry-nous` — the kernel as lived in production:
+- My personal AI node: the kernel as lived in production:
   `api/tools/__init__.py` (tiers + dispatch gate), `api/tools/approvals.py`
   (single-use args-bound tokens), `api/tools/egress.py` (outbound scan),
   `api/tools/audit.py` (JSONL trail), `api/identity/permits.py` (typed,
-  time-bound signed permits). permitd is an extraction, not a fork: nous keeps
+  time-bound signed permits). permitd is a standalone package, not a fork: the node keeps
   its copy; divergence is expected and fine.
 
 ## Positioning inputs
 
 `discussions/2026-07-12_brainfoundry-loop-state-layer-reframe.md` and
 `discussions/2026-07-12_brainfoundry-competitive-landscape-memory-governance.md`
-(hbar.world): the governance kernel and the MCP loop-state wedge are ONE
+(my notes): the governance kernel and the MCP loop-state wedge are ONE
 artifact; README speaks both languages; ride the loop-engineering vocabulary
 while it is current.
 

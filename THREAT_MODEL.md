@@ -141,6 +141,6 @@ counter.
 
 ## Reporting
 
-Open an issue at https://github.com/hbar-systems/permitd/issues. There is no
+Open an issue at https://github.com/gregorygerman777-hub/permits-/issues. There is no
 private disclosure channel yet; if you need one, say so in the issue and it
 will be arranged.

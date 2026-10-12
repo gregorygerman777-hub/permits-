@@ -10,7 +10,7 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
-authors = [{ name = "hbar-systems" }]
+authors = [{ name = "Gregory German" }]
 keywords = [
     "agent", "governance", "human-in-the-loop", "mcp", "permits",
     "approval", "audit", "loop-engineering", "agent-loops", "tool-use",
@@ -35,8 +35,8 @@ mcp = ["mcp>=1.0"]
 dev = ["pytest>=8"]
 
 [project.urls]
-Homepage = "https://github.com/hbar-systems/permitd"
-Issues = "https://github.com/hbar-systems/permitd/issues"
+Homepage = "https://github.com/gregorygerman777-hub/permits-"
+Issues = "https://github.com/gregorygerman777-hub/permits-/issues"
 
 [project.scripts]
 permitd = "permitd.cli:main"

