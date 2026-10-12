@@ -14,8 +14,8 @@ Created: 2026-07-29
 
 ## What this is
 
-A pip-installable governance kernel for agent tool execution, extracted from
-`brainfoundry-nous` (where it runs in production as the tool-dispatch gate).
+A pip-installable governance kernel for agent tool execution, built from the
+tool-dispatch gate of my personal AI node (where it runs in production).
 One artifact, two vocabularies, deliberately:
 
 - **Governance vocabulary:** permits, per-call approval, fail-closed
@@ -118,11 +118,11 @@ call executes with the audit line landing. No agent-side changes at all.
 - My earlier console prototype (2026-03) — the original
   PROPOSE/CONFIRM/EXECUTE + audit-trail prototype; the interaction grammar
   started there.
-- `brainfoundry-nous` — the kernel as lived in production:
+- My personal AI node: the kernel as lived in production:
   `api/tools/__init__.py` (tiers + dispatch gate), `api/tools/approvals.py`
   (single-use args-bound tokens), `api/tools/egress.py` (outbound scan),
   `api/tools/audit.py` (JSONL trail), `api/identity/permits.py` (typed,
-  time-bound signed permits). permitd is an extraction, not a fork: nous keeps
+  time-bound signed permits). permitd is a standalone package, not a fork: the node keeps
   its copy; divergence is expected and fine.
 
 ## Positioning inputs
