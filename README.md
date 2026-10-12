@@ -212,14 +212,12 @@ your loop, your model, or your prompts. It is the layer that holds the state
 of "may this run?" across turns — and the receipt after it did. What it does
 and does not defend against: [THREAT_MODEL.md](THREAT_MODEL.md).
 
-## Ancestry
+## Background
 
-Extracted from the tool-governance kernel of
-my personal AI node, where
-it runs in production gating a personal AI node's tools. The
-propose/confirm/execute + audit grammar goes back to
-my earlier console prototype
-(2026-03). Design notes: [DESIGN.md](DESIGN.md).
+permitd grew out of the tool-governance layer I built for my own personal AI
+node, where it runs in production gating that node's tools. The
+propose/confirm/execute + audit grammar comes from an earlier console
+prototype of mine (2026-03). Design notes: [DESIGN.md](DESIGN.md).
 
 ## License
 
